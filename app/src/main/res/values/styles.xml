@@ -1,0 +1,13 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryDark">@color/red</item>
+        <item name="colorAccent">@color/blue_grey_400</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay"></style>
+
+    <style name="AppTheme.PopupOverlay"></style>
+
+</resources>
