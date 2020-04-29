@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">ML Kit</string>
-    <string name="appbar_scrolling_view_behavior">scrolling view behavior</string>
     <string name="text">text</string>
-
 </resources>
