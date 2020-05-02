@@ -1,32 +1,31 @@
 package com.example.mlkit
+
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mlkit.databinding.ActivityMainBinding
+import com.google.android.material.chip.Chip
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.text.FirebaseVisionText
 import kotlinx.android.synthetic.main.activity_main.*
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    var isText  = false
+    private var isText = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
 
-        switch1.setOnClickListener{
+        switch1.setOnClickListener {
             isText = switch1.isChecked
         }
         binding.fab.setOnClickListener {
@@ -34,12 +33,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    companion object{
-        private var IMAGE_PICK_CODE = 180
-    }
-
     private fun pickImage() {
-
         val intent = Intent().apply {
             action = Intent.ACTION_PICK
             type = "image/*"
@@ -47,19 +41,18 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMAGE_PICK_CODE)
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode ==  Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                Companion.IMAGE_PICK_CODE -> {
+                IMAGE_PICK_CODE -> {
                     val bitmap = getImageFromData(data)
                     bitmap?.apply {
                         imageView.setImageBitmap(this)
 
-                        if(!isText){
+                        if (!isText) {
                             processImageTagging(bitmap)
                         }
-                        if(isText){
+                        if (isText) {
                             startTextRecognizing(bitmap)
                         }
 
@@ -72,15 +65,19 @@ class MainActivity : AppCompatActivity() {
             data
         )
     }
+
     private fun processImageTagging(bitmap: Bitmap) {
         val visionImg = FirebaseVisionImage.fromBitmap(bitmap)
         FirebaseVision.getInstance().onDeviceImageLabeler.processImage(visionImg)
             .addOnSuccessListener { tags ->
-                resultLabels.text = tags.sortedByDescending {
-                    it.confidence }
-
-                    .joinToString(" ")
-                    { it.text }
+                binding.chipGroup.removeAllViews()
+                tags.sortedByDescending { it.confidence }
+                    .map {
+                        Chip(this, null, R.style.Widget_MaterialComponents_Chip_Choice)
+                            .apply { text = it.text }
+                    }.forEach {
+                        binding.chipGroup.addView(it)
+                    }
             }
             .addOnFailureListener { ex ->
                 Log.wtf("LAB", ex)
@@ -95,8 +92,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-
-    private fun startTextRecognizing(bitmap :Bitmap) {
+    private fun startTextRecognizing(bitmap: Bitmap) {
         if (binding.imageView.drawable != null) {
             //Initialize input object
             val image = FirebaseVisionImage.fromBitmap(bitmap)
@@ -106,7 +102,7 @@ class MainActivity : AppCompatActivity() {
             detector.processImage(image)
                 .addOnSuccessListener { firebaseVisionText ->
                     // Task completed successfully
-                   resultLabels.text = processTextBlock(firebaseVisionText)
+                    processTextBlock(firebaseVisionText)
                 }
                 .addOnFailureListener {
                     // Task failed with an exception
@@ -117,23 +113,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun processTextBlock(result: FirebaseVisionText): String {
-        val resultText = result.text
-        resultLabels.text = resultText
-
-        for (block in result.textBlocks) {
-            val blockText = block.text
-
-            for (line in block.lines) {
-                val lineText = line.text
-                for (element in line.elements) {
-                    val elementText = element.text
-                    val elementFrame = element.boundingBox
-
-                }
-            }
+    private fun processTextBlock(result: FirebaseVisionText) {
+        binding.chipGroup.removeAllViews()
+        result.textBlocks.map {
+            Chip(this, null, R.style.Widget_MaterialComponents_Chip_Choice)
+                .apply { text = it.text }
+        }.forEach {
+            binding.chipGroup.addView(it)
         }
-        return resultText
+    }
+
+
+
+    companion object {
+        private var IMAGE_PICK_CODE = 180
     }
 
 }

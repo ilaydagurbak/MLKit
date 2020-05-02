@@ -9,4 +9,5 @@
     <string name="find_face_contour_button">face contour</string>
     <string name="find_text_cloud_button">text cloud</string>
     <string name="find_objects_button">objects</string>
+    <string name="select_picture">select picture</string>
 </resources>
