@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">ML Kit</string>
     <string name="text">text</string>
+    <string name="upload">upload</string>
+    <string name="detect">detect</string>
+    <string name="showText">show</string>
+    <string name="select_image_for_text_recognition">select</string>
+    <string name="find_text_button">find</string>
+    <string name="find_face_contour_button">face contour</string>
+    <string name="find_text_cloud_button">text cloud</string>
+    <string name="find_objects_button">objects</string>
 </resources>
